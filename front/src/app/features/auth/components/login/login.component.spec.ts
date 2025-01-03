@@ -11,15 +11,21 @@ import { expect } from '@jest/globals';
 import { SessionService } from 'src/app/services/session.service';
 
 import { LoginComponent } from './login.component';
+import { AuthService } from '../../services/auth.service';
+import { of, throwError } from 'rxjs';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
 
+  const authServiceMock = {
+    login: jest.fn().mockReturnValue(of({ token: 'fake-token' })),
+  };
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [LoginComponent],
-      providers: [SessionService],
+      providers: [SessionService, { provide: AuthService, useValue: authServiceMock }],
       imports: [
         RouterTestingModule,
         BrowserAnimationsModule,
@@ -36,7 +42,74 @@ describe('LoginComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  // unit tests
+  it('should create the component', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should have a form with email and password controls', () => {
+    expect(component.form.contains('email')).toBe(true);
+    expect(component.form.contains('password')).toBe(true);
+  });
+
+  it('should make email control required', () => {
+    const emailControl = component.form.get('email');
+    emailControl?.setValue('');
+    expect(emailControl?.valid).toBeFalsy();
+    expect(emailControl?.errors?.['required']).toBeTruthy();
+  });
+
+  it('should validate email format', () => {
+    const emailControl = component.form.get('email');
+    emailControl?.setValue('invalid-email');
+    expect(emailControl?.valid).toBeFalsy();
+    expect(emailControl?.errors?.['email']).toBeTruthy();
+  });
+
+  it('should make password control required', () => {
+    const passwordControl = component.form.get('password');
+    passwordControl?.setValue('');
+    expect(passwordControl?.valid).toBeFalsy();
+    expect(passwordControl?.errors?.['required']).toBeTruthy();
+  });
+
+  it('should toggle password visibility', () => {
+    const initialHideValue = component.hide;
+    component.hide = !initialHideValue;
+    expect(component.hide).toBe(!initialHideValue);
+  });
+
+  it('should disable the submit button if the form is invalid', () => {
+    component.form.get('email')?.setValue('');
+    component.form.get('password')?.setValue('');
+    fixture.detectChanges();
+  
+    const button = fixture.nativeElement.querySelector('button[type="submit"]');
+    expect(button.disabled).toBe(true); // Le bouton devrait être désactivé
+  });
+
+  it('should call submit method when form is submitted', () => {
+    const spySubmit = jest.spyOn(component, 'submit');
+    component.form.get('email')?.setValue('test@example.com');
+    component.form.get('password')?.setValue('123456');
+  
+    fixture.detectChanges();
+  
+    const form = fixture.nativeElement.querySelector('form');
+    form.dispatchEvent(new Event('submit'));
+  
+    expect(spySubmit).toHaveBeenCalled(); // Vérifie que `submit` a été appelé
+    expect(authServiceMock.login).toHaveBeenCalledWith({
+      email: 'test@example.com',
+      password: '123456',
+    }); // Vérifie que le service a été appelé avec les bonnes données
+  });
+
+  it('should display error message when onError is true', () => {
+    component.onError = true;
+    fixture.detectChanges();
+    const errorElement = fixture.nativeElement.querySelector('.error');
+    expect(errorElement).toBeTruthy();
+    expect(errorElement.textContent).toContain('An error occurred');
   });
 });
