@@ -9,14 +9,22 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { expect } from '@jest/globals';
 
 import { RegisterComponent } from './register.component';
+import { of, throwError } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
+import { SessionService } from 'src/app/services/session.service';
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
   let fixture: ComponentFixture<RegisterComponent>;
 
+  const authServiceMock = {
+      register: jest.fn().mockReturnValue(of({ message: 'Registration successful' })),
+    };
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [RegisterComponent],
+      providers: [SessionService, { provide: AuthService, useValue: authServiceMock }],
       imports: [
         BrowserAnimationsModule,
         HttpClientModule,
@@ -34,6 +42,7 @@ describe('RegisterComponent', () => {
     fixture.detectChanges();
   });
 
+  /*********** UNIT TESTS ***********/ 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
@@ -109,6 +118,57 @@ describe('RegisterComponent', () => {
     component.onError = true;
     fixture.detectChanges();
 
+    const errorElement = fixture.nativeElement.querySelector('.error');
+    expect(errorElement).toBeTruthy();
+    expect(errorElement.textContent).toContain('An error occurred');
+  });
+
+  /*********** INTEGRATION TESTS ***********/ 
+  it('should complete the registration flow successfully', () => {
+    // Simulate user input
+    component.form.get('firstName')?.setValue('John');
+    component.form.get('lastName')?.setValue('Doe');
+    component.form.get('email')?.setValue('john.doe@example.com');
+    component.form.get('password')?.setValue('password123');
+
+    // Trigger form submission
+    const form = fixture.nativeElement.querySelector('form');
+    form.dispatchEvent(new Event('submit'));
+
+    // Assert the service is called with correct data
+    expect(authServiceMock.register).toHaveBeenCalledWith({
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john.doe@example.com',
+      password: 'password123',
+    });
+
+    // Simulate response processing
+    fixture.detectChanges();
+
+    // Ensure no error message is displayed
+    const errorElement = fixture.nativeElement.querySelector('.error');
+    expect(errorElement).toBeNull();
+  });
+
+  it('should display an error message if registration fails', () => {
+    // Mock service to return an error
+    authServiceMock.register.mockReturnValue(throwError(() => new Error('Registration failed')));
+
+    // Simulate user input
+    component.form.get('firstName')?.setValue('John');
+    component.form.get('lastName')?.setValue('Doe');
+    component.form.get('email')?.setValue('john.doe@example.com');
+    component.form.get('password')?.setValue('password123');
+
+    // Trigger form submission
+    const form = fixture.nativeElement.querySelector('form');
+    form.dispatchEvent(new Event('submit'));
+
+    // Simulate response processing
+    fixture.detectChanges();
+
+    // Assert error message is displayed
     const errorElement = fixture.nativeElement.querySelector('.error');
     expect(errorElement).toBeTruthy();
     expect(errorElement.textContent).toContain('An error occurred');

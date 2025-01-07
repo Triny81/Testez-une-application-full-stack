@@ -25,6 +25,7 @@ describe('SessionService', () => {
     service = TestBed.inject(SessionService);
   });
 
+  /*********** UNIT TESTS ***********/
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
@@ -46,7 +47,7 @@ describe('SessionService', () => {
       token: 'fake-token',
       type: 'type',
       id: 1,
-      username: "Usernm",
+      username: "Username",
       firstName: "John",
       lastName: "Doe",
       admin: true
@@ -68,7 +69,7 @@ describe('SessionService', () => {
       token: 'fake-token',
       type: 'type',
       id: 1,
-      username: "Usernm",
+      username: "Username",
       firstName: "John",
       lastName: "Doe",
       admin: true
@@ -91,7 +92,7 @@ describe('SessionService', () => {
       token: 'fake-token',
       type: 'type',
       id: 1,
-      username: "Usernm",
+      username: "Username",
       firstName: "John",
       lastName: "Doe",
       admin: true
@@ -110,5 +111,90 @@ describe('SessionService', () => {
 
     service.logIn(mockSession);
     service.logOut();
+  });
+
+  /*********** INTEGRATION TESTS ***********/
+  it('should correctly handle a full user session lifecycle', (done) => {
+    const mockSession: SessionInformation = {
+      token: 'fake-token',
+      type: 'admin',
+      id: 42,
+      username: 'adminUser',
+      firstName: 'Admin',
+      lastName: 'User',
+      admin: true,
+    };
+
+    const states: boolean[] = [];
+
+    service.$isLogged().subscribe((isLogged) => {
+      states.push(isLogged);
+
+      if (states.length === 3) {
+        expect(states).toEqual([false, true, false]);
+        done();
+      }
+    });
+
+    // Log in and out
+    service.logIn(mockSession);
+    service.logOut();
+  });
+
+  it('should emit the correct isLogged state after multiple changes', (done) => {
+    const mockSession1: SessionInformation = {
+      token: 'token-1',
+      type: 'user',
+      id: 1,
+      username: 'user1',
+      firstName: 'User',
+      lastName: 'One',
+      admin: false,
+    };
+
+    const mockSession2: SessionInformation = {
+      token: 'token-2',
+      type: 'admin',
+      id: 2,
+      username: 'user2',
+      firstName: 'User',
+      lastName: 'Two',
+      admin: true,
+    };
+
+    const states: boolean[] = [];
+
+    service.$isLogged().subscribe((isLogged) => {
+      states.push(isLogged);
+
+      if (states.length === 5) {
+        expect(states).toEqual([false, true, false, true, false]);
+        done();
+      }
+    });
+
+    // Multiple log in and out scenarios
+    service.logIn(mockSession1);
+    service.logOut();
+    service.logIn(mockSession2);
+    service.logOut();
+  });
+
+  it('should reset session information on logOut', () => {
+    const mockSession: SessionInformation = {
+      token: 'test-token',
+      type: 'user',
+      id: 123,
+      username: 'testUser',
+      firstName: 'Test',
+      lastName: 'User',
+      admin: false,
+    };
+
+    service.logIn(mockSession);
+    expect(service.sessionInformation).toEqual(mockSession);
+
+    service.logOut();
+    expect(service.sessionInformation).toBeUndefined();
   });
 });
