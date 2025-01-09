@@ -1,43 +1,63 @@
-// ***********************************************
-// This example namespace declaration will help
-// with Intellisense and code completion in your
-// IDE or Text Editor.
-// ***********************************************
-// declare namespace Cypress {
-//   interface Chainable<Subject = any> {
-//     customCommand(param: any): typeof customCommand;
-//   }
-// }
-//
-// function customCommand(param: any): void {
-//   console.warn(param);
-// }
-//
-// NOTE: You can use it like so:
-// Cypress.Commands.add('customCommand', customCommand);
-//
-// ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add("login", (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add("drag", { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add("dismiss", { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+declare namespace Cypress {
+    interface Chainable {
+        login(isAdmin: boolean): void;
+    }
+}
+
+Cypress.Commands.add("login", (isAdmin: boolean) => { // auto connexion
+    cy.visit('/login');
+
+    cy.intercept('POST', '/api/auth/login', {
+        body: {
+            id: 1,
+            username: 'MGarnier',
+            firstName: 'Garnier',
+            lastName: 'Michel',
+            email: 'michel.garnier@test.com',
+            admin: isAdmin,
+            createdAt: "2024-12-27T10:51:20",
+            updatedAt: "2024-12-27T10:51:20"
+        },
+    });
+
+    cy.intercept('GET', '/api/session', { // Propose une liste de sessions
+        statusCode: 200,
+        body: [
+            {
+                id: 1,
+                name: "Yoga for Beginners",
+                date: "2024-12-26T00:00:00.000+00:00",
+                teacher_id: 1,
+                description: "A session designed for yoga beginners.",
+                users: [],
+                createdAt: "2024-12-27T14:34:29",
+                updatedAt: "2024-12-27T14:35:17"
+            },
+            {
+                id: 2,
+                name: "Advanced Yoga",
+                date: "2024-12-26T00:00:00.000+00:00",
+                teacher_id: 1,
+                description: "Challenging yoga poses for experienced practitioners.",
+                users: [],
+                createdAt: "2024-12-27T14:34:29",
+                updatedAt: "2024-12-27T14:35:17"
+            },
+            {
+                id: 3,
+                name: "Yoga and Meditation",
+                date: "2024-12-26T00:00:00.000+00:00",
+                teacher_id: 1,
+                description: "A mix of yoga and meditation techniques.",
+                users: [],
+                createdAt: "2024-12-27T14:34:29",
+                updatedAt: "2024-12-27T14:35:17"
+            }
+        ],
+    }).as('getSessions');
+
+    cy.get('input[formControlName=email]').type("yoga@studio.com");
+    cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`);
+
+    cy.url().should('include', '/sessions');
+});
