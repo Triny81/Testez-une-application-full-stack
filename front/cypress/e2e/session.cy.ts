@@ -1,5 +1,3 @@
-/*
-
 before(() => {
     cy.login(false);
 });
@@ -381,7 +379,7 @@ describe('Delete a session by an admin', () => {
         });
     });
 });
-*/
+
 describe('Edit a session by an admin', () => {
     before(() => {
         cy.intercept('GET', '/api/session/1', {
