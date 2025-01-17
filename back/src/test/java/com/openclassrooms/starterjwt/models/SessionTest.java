@@ -53,4 +53,32 @@ class SessionTest {
         assertTrue(session.toString().contains("Yoga Session"));
         assertTrue(session.toString().contains("Relaxing yoga session"));
     }
+
+    @Test
+    void shouldHandleNullValuesGracefully() {
+        User user = new User();
+
+        assertNull(user.getEmail());
+        assertNull(user.getFirstName());
+        assertNull(user.getLastName());
+        assertNull(user.getPassword());
+        assertNull(user.getCreatedAt());
+        assertNull(user.getUpdatedAt());
+    }
+
+    @Test
+    void shouldValidateEqualityForNullFields() {
+        User user1 = new User(null, "", "", "", "", false, null, null);
+        User user2 = new User(null, "", "", "", "", false, null, null);
+
+        assertEquals(user1, user2);
+        assertEquals(user1.hashCode(), user2.hashCode());
+    }
+
+    @Test
+    void shouldValidateToStringHandlesNulls() {
+        User user = new User();
+        String result = user.toString();
+        assertTrue(result.contains("null"));
+    }
 }

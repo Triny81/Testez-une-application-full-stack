@@ -63,4 +63,38 @@ class UserDetailsImplTest {
         assertTrue(authorities instanceof HashSet);
         assertTrue(authorities.isEmpty());
     }
+
+    @Test
+    void shouldReturnAdminStatus() {
+        UserDetailsImpl userDetails = new UserDetailsImpl(1L, "testUser", "John", "Doe", true, "password");
+        boolean isAdmin = userDetails.getAdmin();
+        assertTrue(isAdmin);
+    }
+
+    @Test
+    void shouldReturnNonAdminStatus() {
+        UserDetailsImpl userDetails = new UserDetailsImpl(1L, "testUser", "John", "Doe", false, "password");
+        boolean isAdmin = userDetails.getAdmin();
+        assertFalse(isAdmin);
+    }
+
+    @Test
+    void shouldTestEqualsForDifferentObjects() {
+        UserDetailsImpl user1 = new UserDetailsImpl(1L, "testUser", "John", "Doe", true, "password");
+        UserDetailsImpl user2 = new UserDetailsImpl(2L, "differentUser", "Jane", "Smith", false, "password");
+
+        assertNotEquals(user1, user2);
+    }
+
+    @Test
+    void shouldTestEqualsForNullObject() {
+        UserDetailsImpl user = new UserDetailsImpl(1L, "testUser", "John", "Doe", true, "password");
+        assertNotEquals(user, null);
+    }
+
+    @Test
+    void shouldTestEqualsForDifferentTypeObject() {
+        UserDetailsImpl user = new UserDetailsImpl(1L, "testUser", "John", "Doe", true, "password");
+        assertNotEquals(user, "a string");
+    }
 }

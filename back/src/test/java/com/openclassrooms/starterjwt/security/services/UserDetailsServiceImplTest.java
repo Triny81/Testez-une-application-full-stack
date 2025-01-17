@@ -48,4 +48,16 @@ class UserDetailsServiceImplTest {
                 () -> userDetailsService.loadUserByUsername("notfound@example.com"));
         assertEquals("User Not Found with email: notfound@example.com", exception.getMessage());
     }
+
+    @Test
+    void shouldTestToStringInUserDetailsImplBuilder() {
+        UserDetailsImpl.UserDetailsImplBuilder builder = UserDetailsImpl.builder()
+                .id(1L)
+                .username("testUser");
+
+        String result = builder.toString();
+
+        assertTrue(result.contains("id=1"));
+        assertTrue(result.contains("username=testUser"));
+    }
 }
