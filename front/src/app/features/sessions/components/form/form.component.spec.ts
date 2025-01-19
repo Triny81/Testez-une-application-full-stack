@@ -135,6 +135,14 @@ describe('FormComponent', () => {
     expect(formValue.description).toBe('');
   });
 
+  it('should validate the form correctly', () => {
+    component.sessionForm!.get('name')?.setValue('Yoga Class');
+    component.sessionForm!.get('date')?.setValue('2025-01-01');
+    component.sessionForm!.get('teacher_id')?.setValue(1);
+    component.sessionForm!.get('description')?.setValue('A relaxing yoga session.');
+    expect(component.sessionForm!.valid).toBe(true);
+  });
+
   it('should mark form as invalid if required fields are missing', () => {
     component.sessionForm!.setValue({
       name: '',
@@ -261,4 +269,31 @@ describe('FormComponent', () => {
 
     expect(saveButton.disabled).toBe(true);
   });
+
+  it('should initialize the form with empty values when no session is provided', () => {
+    component['initForm']();
+    expect(component.sessionForm!.value).toEqual({
+      name: '',
+      date: '',
+      teacher_id: '',
+      description: ''
+    });
+  });
+
+  it('should initialize the form with provided session values', () => {
+    const session: any = {
+      name: 'Test Session',
+      date: '2023-01-01',
+      teacher_id: 1,
+      description: 'Test description'
+    };
+
+    component['initForm'](session);
+    expect(component.sessionForm!.value).toEqual({
+      name: session.name,
+      date: session.date,
+      teacher_id: session.teacher_id,
+      description: session.description
+    });
+  });  
 });
