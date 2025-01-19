@@ -37,11 +37,6 @@ describe('ListComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  /*it('should display session details', () => { // !!!!!!!!!!!!!!!!!!!!!!!!!! LE TITRE NEST PAS BON
-    const sessionCard = fixture.nativeElement.querySelector('mat-card-title');
-    expect(sessionCard.textContent).toContain('Yoga Session');
-  });*/
-
   it('should have a create button if user is admin', () => {
     const createButton = fixture.nativeElement.querySelector('button[routerLink="create"]');
     expect(createButton).toBeTruthy();

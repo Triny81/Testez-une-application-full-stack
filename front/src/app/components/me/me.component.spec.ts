@@ -25,7 +25,7 @@ describe('MeComponent', () => {
       id: 1
     },
     logOut: jest.fn(),
-  }
+  };
 
   const mockUserService = {
     getById: jest.fn().mockReturnValue(of({ firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com', admin: false })),
@@ -49,7 +49,8 @@ describe('MeComponent', () => {
         RouterTestingModule,
         NoopAnimationsModule 
       ],
-      providers: [{ provide: SessionService, useValue: mockSessionService }, 
+      providers: [
+        { provide: SessionService, useValue: mockSessionService }, 
         { provide: UserService, useValue: mockUserService },
         { provide: Router, useValue: mockRouter }
       ],
@@ -61,6 +62,7 @@ describe('MeComponent', () => {
     fixture.detectChanges();
   });
 
+  /*********** UNIT TESTS ***********/
   it('should create', () => {
     expect(component).toBeTruthy();
   });
@@ -82,6 +84,7 @@ describe('MeComponent', () => {
     expect(backSpy).toHaveBeenCalled();
   });
 
+  /*********** INTEGRATION TESTS ***********/
   it('should call delete and logOut methods on account deletion', fakeAsync(() => {
     const snackBar = TestBed.inject(MatSnackBar);
     const snackBarSpy = jest.spyOn(snackBar, 'open');

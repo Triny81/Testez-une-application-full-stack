@@ -26,7 +26,7 @@ describe('FormComponent', () => {
     sessionInformation: {
       admin: true
     },
-  }
+  };
 
   const mockSession = {
     id: '123',
@@ -49,7 +49,7 @@ describe('FormComponent', () => {
     url: '',
     navigate: jest.fn()
   };
-  
+
   const mockRoute = {
     snapshot: {
       paramMap: {
@@ -57,13 +57,13 @@ describe('FormComponent', () => {
       }
     }
   };
-  
+
   const mockFormBuilder = new FormBuilder();
-  
+
   const mockMatSnackBar = {
     open: jest.fn()
   };
-  
+
   const mockSessionApiService = {
     create: jest.fn().mockReturnValue(of({})), 
     update: jest.fn().mockReturnValue(of({})), 
@@ -163,6 +163,20 @@ describe('FormComponent', () => {
     expect(component.submit).toHaveBeenCalled();
   });
 
+  it('should enable the Save button when the form is valid', () => {
+    component.sessionForm!.setValue({
+      name: 'Valid Name',
+      date: '2023-01-01',
+      teacher_id: 1,
+      description: 'Valid Description'
+    });
+
+    fixture.detectChanges();
+    const button = fixture.nativeElement.querySelector('button[type="submit"]');
+    expect(button.disabled).toBe(false);
+  });
+
+  /*********** INTEGRATION TESTS ***********/
   it('should display teachers in dropdown', async () => {
     component.teachers$ = of(mockTeachers); // Mock l'observable
     fixture.detectChanges();
@@ -188,52 +202,11 @@ describe('FormComponent', () => {
     expect(title).toContain('Update session');
   });
 
-  it('should handle form submission when onUpdate is true', () => {
-    component.onUpdate = true;
-    component.sessionForm!.setValue({
-      name: 'Updated Session',
-      date: '2023-01-01',
-      teacher_id: 1,
-      description: 'Updated description'
-    });
-
-    jest.spyOn(component, 'submit');
-    component.submit();
-    expect(component.submit).toHaveBeenCalled();
-  });
-
-  it('should not submit the form if it is invalid', () => {
-    component.sessionForm!.setValue({
-      name: '',
-      date: '',
-      teacher_id: null,
-      description: ''
-    });
-
-    jest.spyOn(component, 'submit');
-    const result = component.submit();
-    expect(component.submit).toHaveBeenCalled();
-    expect(result).toBeUndefined(); // Suppose que submit retourne quelque chose
-  });
-
-  it('should enable the Save button when the form is valid', () => {
-    component.sessionForm!.setValue({
-      name: 'Valid Name',
-      date: '2023-01-01',
-      teacher_id: 1,
-      description: 'Valid Description'
-    });
-
-    fixture.detectChanges();
-    const button = fixture.nativeElement.querySelector('button[type="submit"]');
-    expect(button.disabled).toBe(false);
-  });
-
   it('should redirect to /sessions if the user is not an admin', () => {
     const mockSessionServiceNonAdmin = {
       sessionInformation: { admin: false }
     };
-    
+
     const component = new FormComponent(
       mockRoute as any,
       mockFormBuilder,
@@ -259,43 +232,16 @@ describe('FormComponent', () => {
       mockTeacherService as any,
       mockRouter as any
     );
-  
-    component.sessionForm = new FormBuilder().group({
-      name: ['Test Session'],
-      date: ['2023-01-01'],
-      teacher_id: [1],
-      description: ['A test session']
-    });
-  
-    const exitPageSpy = jest.spyOn(component as any, 'exitPage');
-  
-    component.onUpdate = false; 
-    component.submit();
 
-    expect(mockSessionApiService.create).toHaveBeenCalled(); 
-    expect(exitPageSpy).toHaveBeenCalledWith('Session created !'); 
-  });
-  
-it('should call sessionApiService.create and exitPage with "Session created !" when onUpdate is false', () => {
-    const component = new FormComponent(
-      mockRoute as any,
-      mockFormBuilder,
-      mockMatSnackBar as any,
-      mockSessionApiService as any,
-      mockSessionService as any,
-      mockTeacherService as any,
-      mockRouter as any
-    );
-  
     component.sessionForm = new FormBuilder().group({
       name: ['Test Session'],
       date: ['2023-01-01'],
       teacher_id: [1],
       description: ['A test session']
     });
-  
+
     const exitPageSpy = jest.spyOn(component as any, 'exitPage');
-  
+
     component.onUpdate = false; 
     component.submit();
 
@@ -303,7 +249,6 @@ it('should call sessionApiService.create and exitPage with "Session created !" w
     expect(exitPageSpy).toHaveBeenCalledWith('Session created !'); 
   });
 
-  /*********** INTEGRATION TESTS ***********/
   it('should disable the Save button if the form is invalid', () => {
     const saveButton = fixture.nativeElement.querySelector('button[type="submit"]');
     expect(saveButton.disabled).toBe(true);
@@ -315,20 +260,5 @@ it('should call sessionApiService.create and exitPage with "Session created !" w
     fixture.detectChanges();
 
     expect(saveButton.disabled).toBe(true);
-  });
-
-  it('should call submit method when the form is submitted', () => {
-    const submitSpy = jest.spyOn(component, 'submit');
-
-    component.sessionForm!.get('name')?.setValue('Yoga Class');
-    component.sessionForm!.get('date')?.setValue('2025-01-01');
-    component.sessionForm!.get('teacher_id')?.setValue(1);
-    component.sessionForm!.get('description')?.setValue('A relaxing yoga session.');
-    fixture.detectChanges();
-
-    const form = fixture.nativeElement.querySelector('form');
-    form.dispatchEvent(new Event('submit'));
-
-    expect(submitSpy).toHaveBeenCalled();
   });
 });

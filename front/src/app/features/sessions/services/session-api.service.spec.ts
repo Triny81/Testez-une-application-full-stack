@@ -43,6 +43,7 @@ describe('SessionsService', () => {
   });
 
   /*********** INTEGRATION TESTS ***********/
+
   it('should fetch all sessions', () => {
     const mockSessions: Session[] = [
       { id: 1, name: 'Session 1', date: new Date(), description: '', teacher_id: 1, users: [] },

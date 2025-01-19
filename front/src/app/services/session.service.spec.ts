@@ -113,6 +113,24 @@ describe('SessionService', () => {
     service.logOut();
   });
 
+  it('should reset session information on logOut', () => {
+    const mockSession: SessionInformation = {
+      token: 'test-token',
+      type: 'user',
+      id: 123,
+      username: 'testUser',
+      firstName: 'Test',
+      lastName: 'User',
+      admin: false,
+    };
+
+    service.logIn(mockSession);
+    expect(service.sessionInformation).toEqual(mockSession);
+
+    service.logOut();
+    expect(service.sessionInformation).toBeUndefined();
+  });
+
   /*********** INTEGRATION TESTS ***********/
   it('should correctly handle a full user session lifecycle', (done) => {
     const mockSession: SessionInformation = {
@@ -136,7 +154,6 @@ describe('SessionService', () => {
       }
     });
 
-    // Log in and out
     service.logIn(mockSession);
     service.logOut();
   });
@@ -173,28 +190,9 @@ describe('SessionService', () => {
       }
     });
 
-    // Multiple log in and out scenarios
     service.logIn(mockSession1);
     service.logOut();
     service.logIn(mockSession2);
     service.logOut();
-  });
-
-  it('should reset session information on logOut', () => {
-    const mockSession: SessionInformation = {
-      token: 'test-token',
-      type: 'user',
-      id: 123,
-      username: 'testUser',
-      firstName: 'Test',
-      lastName: 'User',
-      admin: false,
-    };
-
-    service.logIn(mockSession);
-    expect(service.sessionInformation).toEqual(mockSession);
-
-    service.logOut();
-    expect(service.sessionInformation).toBeUndefined();
   });
 });

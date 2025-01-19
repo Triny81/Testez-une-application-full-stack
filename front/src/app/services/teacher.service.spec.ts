@@ -10,7 +10,7 @@ describe('TeacherService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports:[
+      imports: [
         HttpClientModule,
         HttpClientTestingModule
       ],
@@ -42,6 +42,8 @@ describe('TeacherService', () => {
   });
 
   /*********** INTEGRATION TESTS ***********/
+
+  // Tests pour les réponses réussies
   it('should fetch teacher details by ID', () => {
     const mockTeacher = { id: 1, name: 'Teacher 1' };
 
@@ -54,6 +56,7 @@ describe('TeacherService', () => {
     req.flush(mockTeacher);
   });
 
+  // Tests pour la gestion des erreurs
   it('should handle HTTP errors for all()', () => {
     const errorMessage = 'Failed to fetch teachers';
 

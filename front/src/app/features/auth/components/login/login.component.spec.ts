@@ -115,44 +115,34 @@ describe('LoginComponent', () => {
 
   /*********** INTEGRATION TESTS ***********/ 
   it('should complete the login flow successfully', () => {
-    // Simulate user input
     component.form.get('email')?.setValue('user@example.com');
     component.form.get('password')?.setValue('password123');
 
-    // Trigger form submission
     const form = fixture.nativeElement.querySelector('form');
     form.dispatchEvent(new Event('submit'));
 
-    // Assert the service is called with correct data
     expect(authServiceMock.login).toHaveBeenCalledWith({
       email: 'user@example.com',
       password: 'password123',
     });
 
-    // Simulate response processing
     fixture.detectChanges();
 
-    // Ensure no error message is displayed
     const errorElement = fixture.nativeElement.querySelector('.error');
     expect(errorElement).toBeNull();
   });
 
   it('should display an error message if login fails', () => {
-    // Mock service to return an error
     authServiceMock.login.mockReturnValue(throwError(() => new Error('Invalid credentials')));
 
-    // Simulate user input
     component.form.get('email')?.setValue('user@example.com');
     component.form.get('password')?.setValue('wrongpassword');
 
-    // Trigger form submission
     const form = fixture.nativeElement.querySelector('form');
     form.dispatchEvent(new Event('submit'));
 
-    // Simulate response processing
     fixture.detectChanges();
 
-    // Assert error message is displayed
     const errorElement = fixture.nativeElement.querySelector('.error');
     expect(errorElement).toBeTruthy();
     expect(errorElement.textContent).toContain('An error occurred');

@@ -2,7 +2,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { RouterTestingModule, } from '@angular/router/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,8 +12,6 @@ import { SessionApiService } from '../../services/session-api.service';
 
 import { DetailComponent } from './detail.component';
 import { of } from 'rxjs';
-
-
 
 describe('DetailComponent', () => {
   let component: DetailComponent;
@@ -25,26 +23,26 @@ describe('DetailComponent', () => {
       admin: true,
       id: 1
     },
-  }
+  };
 
   const mockSessionApiService = {
-    delete: jest.fn().mockReturnValue(of({})), // Mock renvoyant un Observable
+    delete: jest.fn().mockReturnValue(of({})),
     detail: jest.fn().mockImplementation(() => {
       return of({
         id: 1,
         name: 'Yoga Session',
         description: 'A relaxing yoga session.',
-        users: sessionUsers, // variable dynamique
+        users: sessionUsers,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
     }),
     participate: jest.fn().mockImplementation(() => {
-      sessionUsers.push(1); // Ajoute un utilisateur
+      sessionUsers.push(1);
       return of({});
     }),
     unParticipate: jest.fn().mockImplementation(() => {
-      sessionUsers = []; // Supprime un utilisateur
+      sessionUsers = [];
       return of({});
     }),
   };
@@ -61,11 +59,11 @@ describe('DetailComponent', () => {
         MatIconModule,
       ],
       declarations: [DetailComponent],
-      providers: [{ provide: SessionService, useValue: mockSessionService },
-      { provide: SessionApiService, useValue: mockSessionApiService },
+      providers: [
+        { provide: SessionService, useValue: mockSessionService },
+        { provide: SessionApiService, useValue: mockSessionApiService },
       ],
-    })
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(DetailComponent);
     component = fixture.componentInstance;
@@ -138,4 +136,3 @@ describe('DetailComponent', () => {
     expect(description.textContent).toContain('A relaxing yoga session.');
   });
 });
-

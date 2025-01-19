@@ -10,7 +10,7 @@ describe('UserService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports:[
+      imports: [
         HttpClientModule,
         HttpClientTestingModule
       ],
@@ -52,6 +52,8 @@ describe('UserService', () => {
   });
 
   /*********** INTEGRATION TESTS ***********/
+
+  // Tests pour les erreurs HTTP 404
   it('should handle error when user not found by ID', () => {
     const errorMessage = 'User not found';
 
@@ -84,6 +86,7 @@ describe('UserService', () => {
     req.flush(errorMessage, { status: 404, statusText: 'Not Found' });
   });
 
+  // Tests pour les erreurs HTTP 500
   it('should handle server error when fetching user details', () => {
     const errorMessage = 'Internal Server Error';
 

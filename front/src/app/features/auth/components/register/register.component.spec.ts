@@ -1,6 +1,6 @@
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -131,11 +131,9 @@ describe('RegisterComponent', () => {
     component.form.get('email')?.setValue('john.doe@example.com');
     component.form.get('password')?.setValue('password123');
 
-    // Trigger form submission
     const form = fixture.nativeElement.querySelector('form');
     form.dispatchEvent(new Event('submit'));
 
-    // Assert the service is called with correct data
     expect(authServiceMock.register).toHaveBeenCalledWith({
       firstName: 'John',
       lastName: 'Doe',
@@ -143,32 +141,25 @@ describe('RegisterComponent', () => {
       password: 'password123',
     });
 
-    // Simulate response processing
     fixture.detectChanges();
 
-    // Ensure no error message is displayed
     const errorElement = fixture.nativeElement.querySelector('.error');
     expect(errorElement).toBeNull();
   });
 
   it('should display an error message if registration fails', () => {
-    // Mock service to return an error
     authServiceMock.register.mockReturnValue(throwError(() => new Error('Registration failed')));
 
-    // Simulate user input
     component.form.get('firstName')?.setValue('John');
     component.form.get('lastName')?.setValue('Doe');
     component.form.get('email')?.setValue('john.doe@example.com');
     component.form.get('password')?.setValue('password123');
 
-    // Trigger form submission
     const form = fixture.nativeElement.querySelector('form');
     form.dispatchEvent(new Event('submit'));
 
-    // Simulate response processing
     fixture.detectChanges();
 
-    // Assert error message is displayed
     const errorElement = fixture.nativeElement.querySelector('.error');
     expect(errorElement).toBeTruthy();
     expect(errorElement.textContent).toContain('An error occurred');
